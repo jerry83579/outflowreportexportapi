@@ -2193,7 +2193,7 @@ namespace OutFlowReportExportAPI.Controllers
 
         #region 取得Odt檔案(附件10,11,13,14,15,16,17,18)
         /// <summary>
-        /// (附件10-EC_ID,附件11-ECS_ID,附件13-SC_ID,附件14-AC_ID)
+        /// (附件10-EC_ID,附件11-ECS_ID,附件13-SC_ID,附件14-AC_ID,附件15)
         /// </summary>
         /// <param name="OfpId">ID</param>
         /// <param name="fileName"></param>
@@ -2237,7 +2237,11 @@ namespace OutFlowReportExportAPI.Controllers
                         Sql = Get_ENENDSelfCheck_Item();
                         repeatData = UtilDB.GetDataList<dynamic>(Sql, new { OfpId });
                         break;
-                    case OfpId.AC_ID:
+                    case OfpId.AC_ID1:
+                        Sql = Get_ENENDApplicationCompleted();
+                        databaseData = UtilDB.GetDataList<dynamic>(Sql, new { OfpId });
+                        break;
+                    case OfpId.AC_ID2:
                         Sql = Get_ENENDApplicationCompleted();
                         databaseData = UtilDB.GetDataList<dynamic>(Sql, new { OfpId });
                         break;
@@ -2330,6 +2334,50 @@ namespace OutFlowReportExportAPI.Controllers
         /// </summary>
         /// <returns></returns>
         public string Get_ENENDApplicationCompleted()
+        {
+            var sql = @"SELECT eac.EN_END_Date, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,
+                      el.EngineerName, pl.PracticeUnits, pl.Address, pl.PracticeLicense, pl.GUI, pl.Tel, start.EN_ST_Date, Approved.Approved_No
+                      FROM [ENEND_Application_Completed] eac 
+                      INNER JOIN [OutflowControlPlan] ofp on eac.OFP_ID = ofp.OFP_ID
+                      INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
+                      INNER JOIN [EngineerList] el on ofp.Engineer = el.ED_ID
+                      INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                      INNER JOIN [EN_Starting] start on eac.ES_ID = start.ES_ID
+                      INNER JOIN [Approved] on eac.OFP_ID = Approved.OFP_ID
+                      WHERE eac.AC_ID = @OfpId";
+            return sql;
+        }
+        /// <summary>
+        /// 附件15
+        /// </summary>
+        /// <returns></returns>
+        public string Get_ENENDFinalCheck()
+        {
+            var sql = @"SELECT 
+                      FROM [ENEND_Final_Check] efc 
+                      WHERE eac.FC_ID = @OfpId";
+            return sql;
+        }
+
+        public string Get_ENENDFinalCheck_Item()
+        {
+            var sql = @"SELECT eac.EN_END_Date, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,
+                      el.EngineerName, pl.PracticeUnits, pl.Address, pl.PracticeLicense, pl.GUI, pl.Tel, start.EN_ST_Date, Approved.Approved_No
+                      FROM [ENEND_Application_Completed] eac 
+                      INNER JOIN [OutflowControlPlan] ofp on eac.OFP_ID = ofp.OFP_ID
+                      INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
+                      INNER JOIN [EngineerList] el on ofp.Engineer = el.ED_ID
+                      INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                      INNER JOIN [EN_Starting] start on eac.ES_ID = start.ES_ID
+                      INNER JOIN [Approved] on eac.OFP_ID = Approved.OFP_ID
+                      WHERE eac.AC_ID = @OfpId";
+            return sql;
+        }
+        /// <summary>
+        /// 附件16
+        /// </summary>
+        /// <returns></returns>
+        public string Get_ENENDCompletion()
         {
             var sql = @"SELECT eac.EN_END_Date, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,
                       el.EngineerName, pl.PracticeUnits, pl.Address, pl.PracticeLicense, pl.GUI, pl.Tel, start.EN_ST_Date, Approved.Approved_No

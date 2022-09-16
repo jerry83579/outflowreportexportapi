@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
+using System.Web.Http;
 
 namespace OutFlowReportExportAPI.Helpers
 {
@@ -72,6 +73,7 @@ namespace OutFlowReportExportAPI.Helpers
         /// <returns></returns>
         public static string GetRptDatabase(string tmp, List<dynamic> databaseData, List<dynamic> repeatData,string filename)
         {
+
             var tDoc = OpenTemplate(tmp);
             AppendLog(new string[] { $"{tmp} has data? {databaseData != null}, template opened?{tDoc != null}" });
             if (null == tDoc || null == databaseData)

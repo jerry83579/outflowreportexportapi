@@ -13,6 +13,8 @@ namespace OutFlowReportExportAPI.Helpers
         ECS_ID1 = 70,
         ECS_ID2 = 72,
         SC_ID = 53,
-        AC_ID = 28
+        AC_ID1 = 23,
+        AC_ID2 = 28,
+        FC_ID = 16
     }
 }
