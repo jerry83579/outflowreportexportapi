@@ -2193,7 +2193,7 @@ namespace OutFlowReportExportAPI.Controllers
 
         #region 取得Odt檔案(附件10,11,13,14,15,16,17,18)
         /// <summary>
-        /// (附件10-EC_ID,附件11-ECS_ID,附件13-SC_ID,附件14-AC_ID,附件15-FC_ID,附件16-CP_ID,附件17-MM_RE_ID)
+        /// (附件10-EC_ID,附件11-ECS_ID,附件13-SC_ID,附件14-AC_ID,附件15-FC_ID,附件16-CP_ID,附件17-MM_RE_ID,附件18-MM_SV_ID)
         /// </summary>
         /// <param name="OfpId">ID</param>
         /// <param name="fileName"></param>
@@ -2226,7 +2226,7 @@ namespace OutFlowReportExportAPI.Controllers
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateBox", duplicateBox},
-                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql = Get_SVCheck_Item(), new { OfpId } )},
+                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql = Get_SVCheck_Duplicate(), new { OfpId } )},
                               {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_SVCheck(), new { OfpId })
                             } };
                         break;
@@ -2234,7 +2234,7 @@ namespace OutFlowReportExportAPI.Controllers
                        databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateBox", duplicateBox},
-                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDSelfCheck_Item(), new { OfpId } )},
+                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDSelfCheck_Duplicate(), new { OfpId } )},
                               {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDSelfCheck(), new { OfpId })
                             } };
                         break;
@@ -2251,7 +2251,7 @@ namespace OutFlowReportExportAPI.Controllers
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateBox", data = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDFinalCheck_Item_Box(), new { OfpId } )},
-                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDFinalCheck_Item(), new { OfpId } )},
+                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDFinalCheck_Duplicate(), new { OfpId } )},
                               {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDFinalCheck(), new { OfpId })
                             } };
                         break;
@@ -2259,7 +2259,7 @@ namespace OutFlowReportExportAPI.Controllers
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateBox", duplicateBox },
-                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDCompletion_Item(), new { OfpId } )},
+                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDCompletion_Duplicate(), new { OfpId } )},
                               {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDCompletion(), new { OfpId })
                             } };
                         break;
@@ -2267,8 +2267,16 @@ namespace OutFlowReportExportAPI.Controllers
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateBox", duplicateBox = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_Record_Box(), new { OfpId } )},
-                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_Record_Item(), new { OfpId } )},
+                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_Record_Duplicate(), new { OfpId } )},
                               {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_Record(), new { OfpId })
+                            } };
+                        break;
+                    case OfpId.MM_SV_ID:
+                        databaseData = new Dictionary<string, dynamic>()
+                            {
+                              {"duplicateBox", duplicateBox = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_SVRecord_Box(), new { OfpId } )},
+                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_SVRecord_Duplicate(), new { OfpId } )},
+                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_SVRecord(), new { OfpId })
                             } };
                         break;
                     default:
@@ -2318,7 +2326,7 @@ namespace OutFlowReportExportAPI.Controllers
             return sql;
         }
         
-        public string Get_SVCheck_Item()
+        public string Get_SVCheck_Duplicate()
         {
             var sql = @"SELECT svcI.Implementation_Situation, svcI.Note
                       FROM [EN_SVCheck_Item] svcI
@@ -2346,7 +2354,7 @@ namespace OutFlowReportExportAPI.Controllers
             return sql;
         }
 
-        public string Get_ENENDSelfCheck_Item()
+        public string Get_ENENDSelfCheck_Duplicate()
         {
             var sql = @"SELECT escI.IsMatchPlan, escI.IsConductChangePlan, escI.DefDescription, escI.Note
                       FROM [ENEND_Self_Check_Item] escI
@@ -2393,7 +2401,7 @@ namespace OutFlowReportExportAPI.Controllers
             return sql;
         }
 
-        public string Get_ENENDFinalCheck_Item()
+        public string Get_ENENDFinalCheck_Duplicate()
         {
             var sql = @"SELECT FacilityName, Location, ApprovedNum, ActualNum, DefPercentNum, DefPercentNum, ApprovedSize, ActualSize, DefPercentSize
                       FROM [ENEND_Final_Check_Item] efcI
@@ -2412,7 +2420,6 @@ namespace OutFlowReportExportAPI.Controllers
         /// 附件16
         /// </summary>
         /// <returns></returns>
-        /// 
         public string Get_ENENDCompletion()
         {
             var sql = @"SELECT ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, 
@@ -2426,7 +2433,7 @@ namespace OutFlowReportExportAPI.Controllers
             return sql;
         }
 
-        public string Get_ENENDCompletion_Item()
+        public string Get_ENENDCompletion_Duplicate()
         {
             var sql = @"SELECT el.EngineerName, el.EngineerLicense,  
                       pl.PracticeUnits, pl.Address, pl.GUI, pl.Tel
@@ -2441,30 +2448,77 @@ namespace OutFlowReportExportAPI.Controllers
         /// 附件17
         /// </summary>
         /// <returns></returns>
-        /// 
-
         public string Get_MM_Record()
         {
-            var sql = "";
+            var sql = @"SELECT mr.MM_Check_Date, mr.MM_Check_Note_Now, mr.MM_Check_Note_Bef, mr.Note, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,
+                      start.EN_ST_Date, eac.EN_END_Date, Approved.Approved_No, Approved.Approved_Date
+                      FROM [MM_Record] mr
+                      INNER JOIN [OutflowControlPlan] ofp on mr.OFP_ID = ofp.OFP_ID
+                      INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
+                      INNER JOIN [Approved] on mr.OFP_ID = Approved.OFP_ID
+                      INNER JOIN [EN_Starting] start on mr.ES_ID = start.ES_ID
+                      INNER JOIN [ENEND_Application_Completed] eac on mr.ES_ID = eac.ES_ID 
+                      WHERE MM_RE_ID = @OfpId";
             return sql;
         }
 
-        public string Get_MM_Record_Item()
+        public string Get_MM_Record_Duplicate()
         {
-            var sql = "";
+            var sql = @"SELECT mrI.Note
+                      FROM [MM_Record_Item] mrI
+                      WHERE mrI.MM_RE_ID = @OfpId";
             return sql;
         }
 
         public string Get_MM_Record_Box()
         {
-            var sql = @"SELECT mrI.IsQualified, mr.MM_Check_Result, mr.MM_Check_Note_Bef
-                      FROM [MM_Record] mr
-                      INNER JOIN [MM_Record_item] mrI on mr.MM_RE_ID = mrI.MM_RE_ID
-                      WHERE mrI.MM_RE_ID = @OfpId";
-            //var sql = @"SELECT mrI.IsQualified, mr.MM_Check_Result, mr.MM_Check_Note_Bef
-            //          FROM [MM_Record_Item] mrI
-            //          INNER JOIN [MM_Record] mr on mrI.MM_RE_ID = mr.MM_RE_ID
-            //          WHERE mrI.MM_RE_ID = @OfpId";
+            var sql = @"SELECT MM_Change_type FROM MM_Record
+					  WHERE MM_RE_ID = @OfpId
+                      UNION ALL
+					  SELECT MM_Check_Result FROM MM_Record 
+                      WHERE MM_RE_ID = @OfpId
+					  UNION ALL
+                      SELECT IsQualified FROM MM_Record_Item
+                      WHERE MM_RE_ID = @OfpId";
+            return sql;
+        }
+        /// <summary>
+        /// 附件18
+        /// </summary>
+        /// <returns></returns>
+        public string Get_MM_SVRecord()
+        {
+            var sql = @"SELECT msvr.MM_SVCheck_Date, msvr.MM_Check_Note_Now, msvr.MM_Check_Note_Bef, msvr.Note, 
+                      ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.pA_Num, payer.PA_address, 
+                      start.EN_ST_Date, eac.EN_END_Date, Approved.Approved_NO, Approved.Approved_Date
+                      FROM [MM_SVRecord] msvr
+                      INNER JOIN [OutflowControlPlan] ofp on msvr.OFP_ID = ofp.OFP_ID
+                      INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
+                      INNER JOIN [Approved] on msvr.OFP_ID = Approved.OFP_ID
+                      INNER JOIN [EN_Starting] start on msvr.ES_ID = start.ES_ID
+                      INNER JOIN [ENEND_Application_Completed] eac on msvr.ES_ID = eac.ES_ID 
+                      WHERE msvr.MM_SV_ID = @OfpId";
+            return sql;
+        }
+        
+        public string Get_MM_SVRecord_Duplicate()
+        {
+            var sql = @"SELECT msvrI.Note
+                      FROM [MM_SVRecord_Item] msvrI
+                      WHERE msvrI.MM_RE_ID = @OfpId";
+            return sql;
+        }
+
+        public string Get_MM_SVRecord_Box()
+        {
+            var sql = @"SELECT MM_SVCheck_Status FROM MM_SVRecord
+					  WHERE MM_SV_ID = @OfpId
+                      UNION ALL
+					  SELECT MM_SVCheck_Result FROM MM_SVRecord 
+                      WHERE MM_SV_ID = @OfpId
+					  UNION ALL
+                      SELECT IsQualified FROM MM_SVRecord_Item
+                      WHERE MM_SV_ID = @OfpId";
             return sql;
         }
         #endregion

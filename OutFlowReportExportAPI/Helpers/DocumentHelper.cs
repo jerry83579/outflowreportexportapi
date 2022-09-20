@@ -106,26 +106,39 @@ namespace OutFlowReportExportAPI.Helpers
                 }
                 if (databaseData["duplicateBox"] != null)
                 {
+                    int index = 0;
+                    string trueBox = "\u25A0";
+                    string falseBox = "\u25A1";
+                    int length = databaseData["duplicateBox"].Count;
+
+                    // 將 ODT 檔案上的浮動資料多於文字刪除
+                    ReplaceText(tDoc, $":True{length}", falseBox);
+                    ReplaceText(tDoc, $":False{length}", falseBox);
+
                     foreach (var data in databaseData["duplicateBox"])
                     {
-                        int index = 0;
-                        string trueBox = "\u25A0";
-                        string falseBox = "\u25A1";
                         foreach (var item in data)
                         {
-                            var value = item.Value ?? "";
-                            if (value)
+                            var value = item.Value;
+                            switch (value)
                             {
-                                ReplaceText(tDoc, $":True{index}", trueBox);
-                                ReplaceText(tDoc, $":False{index}", falseBox);
+                                case true:
+                                    ReplaceText(tDoc, $":True{index}", trueBox);
+                                    ReplaceText(tDoc, $":False{index}", falseBox);
+                                    break;
+                                case false:
+                                    ReplaceText(tDoc, $":True{index}", falseBox);
+                                    ReplaceText(tDoc, $":False{index}", trueBox);
+                                    break;
+                                case null:
+                                    ReplaceText(tDoc, $":True{index}", falseBox);
+                                    ReplaceText(tDoc, $":False{index}", falseBox);
+                                    break;
+                                default:
+                                    break;
                             }
-                            else
-                            {
-                                ReplaceText(tDoc, $":True{index}", falseBox);
-                                ReplaceText(tDoc, $":False{index}", trueBox);
-                            }
+                            index++;
                         }
-                        index++;
                     }
                 }
                 try
