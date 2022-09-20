@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Http;
 
@@ -16,12 +17,12 @@ namespace OutFlowReportExportAPI.Helpers
     public class DocumentHelper
     {
         /// <summary>
-        /// 產生資料內容
+        /// 
         /// </summary>
-        /// <param name="tmp">樣板路徑</param>
-        /// <param name="data">資料</param>
-        /// <param name="filename">要回傳的檔名</param>
-        /// <returns>回傳檔案路徑</returns>
+        /// <param name="tmp"></param>
+        /// <param name="data"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public static string GetRptStream(string tmp, JObject data, string filename)
         {
             var tDoc = OpenTemplate(tmp);
@@ -59,36 +60,41 @@ namespace OutFlowReportExportAPI.Helpers
                 {
                     tDoc.Dispose();
                 }
-
             }
         }
 
 
-        /// <summary>
-        /// 從資料庫取內容
-        /// </summary>
-        /// <param name="tmp"></param>
-        /// <param name="data"></param>
-        /// <param name="filename"></param>
-        /// <returns></returns>
-        public static string GetRptDatabase(string tmp, List<dynamic> databaseData, List<dynamic> repeatData,string filename)
+       /// <summary>
+       /// 
+       /// </summary>
+       /// <param name="tmp">讀取的檔案名稱</param>
+       /// <param name="databaseData">讀取資料庫的資料</param>
+       /// <param name="filename">欲新增的檔案名稱</param>
+       /// <returns></returns>
+        public static string GetRptDatabase(string tmp, Dictionary<string, dynamic> databaseData, string filename)
         {
-
             var tDoc = OpenTemplate(tmp);
             AppendLog(new string[] { $"{tmp} has data? {databaseData != null}, template opened?{tDoc != null}" });
             if (null == tDoc || null == databaseData)
                 return "";
             else
             {
-                string path = Path.Combine(HttpRuntime.BinDirectory, "..", "App_Data", "temp", "appendix", databaseData.FirstOrDefault().OFP_No, $"{filename}");
+                string path = Path.Combine(HttpRuntime.BinDirectory, "..", "App_Data", "temp", "appendix", databaseData["data"][0].OFP_No, $"{filename}");
                 if (!Directory.Exists(Path.GetDirectoryName(path)))
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
-
-                // 寫入資料
-                if (repeatData != null)
+                //寫入資料
+                foreach (var data in databaseData["data"])
                 {
-                    var index = 0;
-                    foreach (var data in repeatData)
+                    foreach (var item in data)
+                    {
+                        var value = item.Value ?? "";
+                        ReplaceText(tDoc, $":{item.Key}", ConvertData(value));
+                    }
+                }
+                if (databaseData["duplicateData"] != null)
+                {
+                    int index = 0;
+                    foreach (var data in databaseData["duplicateData"])
                     {
                         foreach (var item in data)
                         {
@@ -98,12 +104,28 @@ namespace OutFlowReportExportAPI.Helpers
                         index++;
                     }
                 }
-                foreach (var data in databaseData)
+                if (databaseData["duplicateBox"] != null)
                 {
-                    foreach (var item in data)
+                    foreach (var data in databaseData["duplicateBox"])
                     {
-                        var value = item.Value ?? "";
-                        ReplaceText(tDoc, $":{item.Key}", ConvertData(value));
+                        int index = 0;
+                        string trueBox = "\u25A0";
+                        string falseBox = "\u25A1";
+                        foreach (var item in data)
+                        {
+                            var value = item.Value ?? "";
+                            if (value)
+                            {
+                                ReplaceText(tDoc, $":True{index}", trueBox);
+                                ReplaceText(tDoc, $":False{index}", falseBox);
+                            }
+                            else
+                            {
+                                ReplaceText(tDoc, $":True{index}", falseBox);
+                                ReplaceText(tDoc, $":False{index}", trueBox);
+                            }
+                        }
+                        index++;
                     }
                 }
                 try
@@ -119,10 +141,11 @@ namespace OutFlowReportExportAPI.Helpers
             }
         }
         /// <summary>
-        /// 判斷資料型態輸出
+        /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
+        /// <param name="v">要轉換的資料</param>
+        /// <param name="b">是否有合格項目框</param>
         /// <returns></returns>
         public static string ConvertData<T>(T v)
         {
