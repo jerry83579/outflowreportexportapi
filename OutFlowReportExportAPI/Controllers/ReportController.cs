@@ -2255,7 +2255,8 @@ namespace OutFlowReportExportAPI.Controllers
                               {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDFinalCheck(), new { OfpId })
                             } };
                         break;
-                    case OfpId.CP_ID:
+                    case OfpId.CP_ID1:
+                    case OfpId.CP_ID2:
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateBox", duplicateBox },
