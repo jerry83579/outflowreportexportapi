@@ -2226,8 +2226,8 @@ namespace OutFlowReportExportAPI.Controllers
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateBox", duplicateBox},
-                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql = Get_SVCheck_Duplicate(), new { OfpId } )},
-                              {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_SVCheck(), new { OfpId })
+                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck_Duplicate(), new { OfpId } )},
+                              {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck(), new { OfpId })
                             } };
                         break;
                     case OfpId.SC_ID:  
@@ -2311,9 +2311,9 @@ namespace OutFlowReportExportAPI.Controllers
         /// 附件11
         /// </summary>
         /// <returns></returns>
-        public string Get_SVCheck()
+        public string Get_ENSVCheck()
         {
-            var sql = @"SELECT ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address, el.EngineerName, pl.PracticeUnits, pl.PracticeLicense,
+            var sql = @"SELECT svc.Check_Date, svc.Inconsistent_Item, svc.Correct_Item, svc.Precautions, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address, el.EngineerName, pl.PracticeUnits, pl.PracticeLicense,
                       pl.GUI, pl.Tel, start.EN_ST_Date, Approved.Approved_No, Approved.Approved_Date
                       FROM [EN_SVCheck] svc
                       INNER JOIN [OutflowControlPlan] ofp on svc.OFP_ID = ofp.OFP_ID
@@ -2326,7 +2326,7 @@ namespace OutFlowReportExportAPI.Controllers
             return sql;
         }
         
-        public string Get_SVCheck_Duplicate()
+        public string Get_ENSVCheck_Duplicate()
         {
             var sql = @"SELECT svcI.Implementation_Situation, svcI.Note
                       FROM [EN_SVCheck_Item] svcI
@@ -2368,7 +2368,7 @@ namespace OutFlowReportExportAPI.Controllers
         /// <returns></returns>
         public string Get_ENENDApplicationCompleted()
         {
-            var sql = @"SELECT eac.EN_END_Date, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,
+            var sql = @"SELECT eac.FILEID, eac.EN_END_Date, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,
                       el.EngineerName, pl.PracticeUnits, pl.Address, pl.PracticeLicense, pl.GUI, pl.Tel, start.EN_ST_Date, Approved.Approved_No
                       FROM [ENEND_Application_Completed] eac 
                       INNER JOIN [OutflowControlPlan] ofp on eac.OFP_ID = ofp.OFP_ID
@@ -2388,7 +2388,7 @@ namespace OutFlowReportExportAPI.Controllers
         {
             var sql = @"SELECT ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num,  payer.PA_address, 
                       el.EngineerName, pl.PracticeUnits, pl.PracticeLicense, pl.GUI, pl.Tel, start.EN_ST_Date,
-                      Approved_No, Approved.Approved_Date, eac.EN_END_Date, efc.FC_Date
+                      Approved_No, Approved.Approved_Date, eac.EN_END_Date, efc.FC_Date, FC_Note
                       FROM [ENEND_Final_Check] efc 
                       INNER JOIN [OutflowControlPlan] ofp on efc.OFP_ID = ofp.OFP_ID
                       INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
@@ -2411,9 +2411,11 @@ namespace OutFlowReportExportAPI.Controllers
 
         public string Get_ENENDFinalCheck_Item_Box()
         {
-            var sql = @"SELECT efcI.IsQualified
-                      FROM [ENEND_Final_Check_Item] efcI
-                      WHERE efcI.FC_ID = @OfpId";
+            var sql = @"SELECT IsQualified FROM ENEND_Final_Check_Item
+					  WHERE FC_ID = @OfpId
+                      UNION ALL
+					  SELECT FC_ResultStatus FROM ENEND_Final_Check 
+                      WHERE FC_ID = @OfpId";
             return sql;
         }
         /// <summary>
