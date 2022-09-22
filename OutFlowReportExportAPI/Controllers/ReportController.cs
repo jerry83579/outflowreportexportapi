@@ -2283,7 +2283,6 @@ namespace OutFlowReportExportAPI.Controllers
                     default:
                         break;
                     }
-                
                 filePath = DocumentHelper.GetRptDatabase($"{fileName}.odt", databaseData, $"{databaseData["data"][0].OFP_No}.odt");
                 return HttpHelper.FileResult(filePath, "application/vnd.oasis.opendocument.spreadsheet"); 
             }

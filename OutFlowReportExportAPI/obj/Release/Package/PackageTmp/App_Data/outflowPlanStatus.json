@@ -1,0 +1,174 @@
+[
+  {
+    "statusCol": "CA_Acc_Status",
+    "cText": "申請開始",
+    "status": [
+      {
+        "val": "0",
+        "text": "尚未提交送審"
+      },
+      {
+        "val": "1",
+        "text": "使用者提出送審"
+      },
+      {
+        "val": "2",
+        "text": "目的事業主管機關受理"
+      },
+      {
+        "val": "3",
+        "text": "主管機關受理"
+      },
+      {
+        "val": "4",
+        "text": "無須提送"
+      }
+    ]
+  },
+  {
+    "statusCol": "RVGov_ReceiptStatus",
+    "cText": "受理申請",
+    "status": [
+      {
+        "val": "0",
+        "text": "未開始"
+      },
+      {
+        "val": "1",
+        "text": "轉送主管機關"
+      },
+      {
+        "val": "2",
+        "text": "待審中"
+      },
+      {
+        "val": "3",
+        "text": "無須送審"
+      }
+
+    ]
+  },
+  {
+    "statusCol": "Accepted_StatusSet",
+    "cText": "行政審查",
+    "status": [
+      {
+        "val": "0",
+        "text": "未開始"
+      },
+      {
+        "val": "1",
+        "text": "受理"
+      },
+      {
+        "val": "2",
+        "text": "拒絕受理"
+      },
+      {
+        "val": "3",
+        "text": "限期補正"
+      }
+    ]
+  },
+  {
+    "statusCol": "Pay_StatusSet",
+    "cText": "通知繳費",
+    "status": [
+      {
+        "val": "0",
+        "text": "未發送通知"
+      },
+      {
+        "val": "1",
+        "text": "發送通知"
+      },
+      {
+        "val": "2",
+        "text": "待繳費"
+      },
+      {
+        "val": "3",
+        "text": "已繳費"
+      }
+    ]
+  },
+  {
+    "statusCol": "Accepted_Status",
+    "cText": "實質審查",
+    "status": [
+      {
+        "val": "0",
+        "text": "未開始"
+      },
+      {
+        "val": "1",
+        "text": "核定"
+      },
+      {
+        "val": "2",
+        "text": "未核定"
+      },
+      {
+        "val": "6",
+        "text": "審查修正核定"
+      },
+      {
+        "val": "3",
+        "text": "限期修正"
+      },
+      {
+        "val": "5",
+        "text": "退件"
+      }
+
+    ]
+  },
+  {
+    "statusCol": "Approved_Status",
+    "cText": "主管機關核定",
+    "status": [
+      {
+        "val": "0",
+        "text": "未開始"
+      },
+      {
+        "val": "1",
+        "text": "已核定"
+      },
+      {
+        "val": "2",
+        "text": "待審中"
+      },
+      {
+        "val": "3",
+        "text": "駁回申請"
+      }
+    ]
+  },
+  {
+    "statusCol": "CA_Approved_Status",
+    "cText": "目的事業主管機關核定",
+    "status": [
+      {
+        "val": "0",
+        "text": "未開始"
+      },
+      {
+        "val": "1",
+        "text": "計畫核准"
+      },
+      {
+        "val": "2",
+        "text": "計畫廢止"
+      },
+      {
+        "val": "3",
+        "text": "無需檢送開發核准"
+      },
+      {
+        "val": "4",
+        "text": "需檢送開發核准"
+      }
+    ]
+  }
+]

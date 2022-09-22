@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Http;
 
@@ -88,6 +89,10 @@ namespace OutFlowReportExportAPI.Helpers
                     foreach (var item in data)
                     {
                         var value = item.Value ?? "";
+                        if (item.Key == "PA_Num")
+                        {
+                            value = Decry(value);
+                        }
                         ReplaceText(tDoc, $":{item.Key}", ConvertData(value));
                     }
                 }
@@ -99,6 +104,10 @@ namespace OutFlowReportExportAPI.Helpers
                         foreach (var item in data)
                         {
                             var value = item.Value ?? "";
+                            if (item.Key == "PA_Num")
+                            {
+                                value = Decry(value);
+                            }
                             ReplaceText(tDoc, $":{item.Key}{index}", ConvertData(value));
                         }
                         index++;
@@ -179,6 +188,38 @@ namespace OutFlowReportExportAPI.Helpers
                         return $"民國{(Int32.Parse(DateTime[0]) - 1911)}年{DateTime[1]}月{DateTime[2]}日";
                 default:
                         return "unknowType";
+            }
+        }
+
+        /// <summary>
+        /// 解密
+        /// </summary>
+        /// <param name="encry">透過Encry加密過的字串</param>
+        /// <returns>解密內容</returns>
+        public static string Decry(string encry)
+        {
+            var bytes = Convert.FromBase64String(encry);
+            using (var ms = new MemoryStream(bytes))
+            {
+                using (var br = new BinaryReader(ms))
+                {
+                    var ivLen = br.ReadInt32();
+                    var iv = br.ReadBytes(ivLen);
+                    var keyLen = br.ReadInt32();
+                    var key = br.ReadBytes(keyLen);
+                    var r = Rijndael.Create();
+                    r.Key = key;
+                    r.IV = iv;
+                    var trans = r.CreateDecryptor();
+                    using (var cs = new CryptoStream(ms, trans, CryptoStreamMode.Read))
+                    {
+                        using (var rmv = new MemoryStream())
+                        {
+                            cs.CopyTo(rmv);
+                            return System.Text.Encoding.UTF8.GetString(rmv.ToArray());
+                        }
+                    }
+                }
             }
         }
 
