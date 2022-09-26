@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Web;
 using System.Web.Http;
+using unoidl.com.sun.star.ucb;
 
 namespace OutFlowReportExportAPI.Helpers
 {
@@ -65,13 +66,13 @@ namespace OutFlowReportExportAPI.Helpers
         }
 
 
-       /// <summary>
-       /// 
-       /// </summary>
-       /// <param name="tmp">讀取的檔案名稱</param>
-       /// <param name="databaseData">讀取資料庫的資料</param>
-       /// <param name="filename">欲新增的檔案名稱</param>
-       /// <returns></returns>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tmp">讀取的檔案名稱</param>
+        /// <param name="databaseData">讀取資料庫的資料</param>
+        /// <param name="filename">欲新增的檔案名稱</param>
+        /// <returns></returns>
         public static string GetRptDatabase(string tmp, Dictionary<string, dynamic> databaseData, string filename)
         {
             var tDoc = OpenTemplate(tmp);
@@ -83,23 +84,96 @@ namespace OutFlowReportExportAPI.Helpers
                 string path = Path.Combine(HttpRuntime.BinDirectory, "..", "App_Data", "temp", "appendix", databaseData["data"][0].OFP_No, $"{filename}");
                 if (!Directory.Exists(Path.GetDirectoryName(path)))
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
-                //寫入資料
-                foreach (var data in databaseData["data"])
-                {
-                    foreach (var item in data)
-                    {
-                        var value = item.Value ?? "";
-                        if (item.Key == "PA_Num")
-                        {
-                            value = Decry(value);
-                        }
-                        ReplaceText(tDoc, $":{item.Key}", ConvertData(value));
-                    }
-                }
+       
+                // 重複資料
                 if (databaseData["duplicateData"] != null)
                 {
                     int index = 0;
+                    string trueBox = "\u25A0";
+                    string falseBox = "\u25A1";
+
                     foreach (var data in databaseData["duplicateData"])
+                    {
+                        foreach (var item in data)
+                        {
+                            var value = item.Value;
+                            switch (item.Key)
+                            {
+                                case "IsQualified":
+                                    if (value == true)
+                                    {
+                                        ReplaceText(tDoc, $":True{index}", ConvertData(trueBox));
+                                        ReplaceText(tDoc, $":False{index}", ConvertData(falseBox));
+                                    }
+                                    else if (value == false)
+                                    {
+                                        ReplaceText(tDoc, $":True{index}", ConvertData(falseBox));
+                                        ReplaceText(tDoc, $":False{index}", ConvertData(trueBox));
+                                    }
+                                    else
+                                    {
+                                        ReplaceText(tDoc, $":True{index}", ConvertData(falseBox));
+                                        ReplaceText(tDoc, $":False{index}", ConvertData(falseBox));
+                                    }
+                                    break;
+                                case "IsMatchPlan":
+                                    if (value == null)
+                                    {
+                                        value = "";
+                                        break;
+                                    }
+                                    value = value ? "是" : "否";
+                                    break;
+                                case "IsConductChangePlan":
+                                    if (value == null)
+                                    {
+                                        value = "";
+                                        break;
+                                    }
+                                    value = value ? "是" : "否";
+                                    break;
+                                case "PA_Num":
+                                    if (value == null)
+                                    {
+                                        value = "";
+                                        break;
+                                    }
+                                    value = Decry(value);
+                                    break;
+                                default:
+                                    value = item.Value ?? "";
+                                    break;
+                            }
+                            if (item.Key != "IsQualified")
+                            {
+                                ReplaceText(tDoc, $":{item.Key}{index}", ConvertData(value));
+                            }
+                        }
+                        index++;
+                    }
+
+                    //  寫進空資料解決動態資料
+                    List<string> listItemKey = new List<string>();
+                    foreach (var data in databaseData["duplicateData"])
+                    {
+                        foreach (var item in data)
+                        {
+                            listItemKey.Add(item.Key);
+                        }
+                    }
+
+                    for (var i = 0; i < 10; i++)
+                    {
+                        foreach (var item in listItemKey)
+                        {
+                            ReplaceText(tDoc, $":{item}{i}", "");
+                            ReplaceText(tDoc, $":True{i}", "");
+                            ReplaceText(tDoc, $":False{i}", "");
+                        }
+                    }
+
+                    // 一般資料
+                    foreach (var data in databaseData["data"])
                     {
                         foreach (var item in data)
                         {
@@ -108,48 +182,28 @@ namespace OutFlowReportExportAPI.Helpers
                             {
                                 value = Decry(value);
                             }
-                            ReplaceText(tDoc, $":{item.Key}{index}", ConvertData(value));
-                        }
-                        index++;
-                    }
-                }
-                if (databaseData["duplicateBox"] != null)
-                {
-                    int index = 0;
-                    string trueBox = "\u25A0";
-                    string falseBox = "\u25A1";
-                    int length = databaseData["duplicateBox"].Count;
-
-                    // 將 ODT 檔案上的浮動資料多於文字刪除
-                    ReplaceText(tDoc, $":True{length}", falseBox);
-                    ReplaceText(tDoc, $":False{length}", falseBox);
-
-                    foreach (var data in databaseData["duplicateBox"])
-                    {
-                        foreach (var item in data)
-                        {
-                            var value = item.Value;
-                            switch (value)
+                            
+                            switch (item.Key)
                             {
-                                case true:
-                                    ReplaceText(tDoc, $":True{index}", trueBox);
-                                    ReplaceText(tDoc, $":False{index}", falseBox);
+                                case "FC_ResultStatus":
+                                    value = value ? "已達完工標準" : "未達完工標準";
                                     break;
-                                case false:
-                                    ReplaceText(tDoc, $":True{index}", falseBox);
-                                    ReplaceText(tDoc, $":False{index}", trueBox);
+                                case "MM_SVCheck_Status":
+                                    value = value ? "是" : "否";
                                     break;
-                                case null:
-                                    ReplaceText(tDoc, $":True{index}", falseBox);
-                                    ReplaceText(tDoc, $":False{index}", falseBox);
+                                case "MM_Check_Result":
+                                case "MM_SVCheck_Result":
+                                    value = value ? "合格" : "不合格";
                                     break;
-                                default:
+                                case "MM_Change_type":
+                                    value = item.Value == null ? "否" : "是(請自行填寫變動項目)，變動項目:";
                                     break;
                             }
-                            index++;
+                            ReplaceText(tDoc, $":{item.Key}", ConvertData(value));
                         }
                     }
                 }
+
                 try
                 {
                     AppendLog(new string[] { $"Generate word => {path}" });
@@ -175,19 +229,18 @@ namespace OutFlowReportExportAPI.Helpers
             switch (v.GetType().Name)
             {
                 case "String":
-                        return v.ToString();
                 case "Double":
-                        return v.ToString();
-                case "Boolean":
-                        return v.ToString() == "True" ? "是" : "否";
+                    return v.ToString();
+                //case "Boolean":
+                //        return v.ToString() == "True" ? "是" : "否";
                 case "DateTime":
-                        value = v.ToString();
-                        int endIndex = value.ToString().IndexOf(" ");
-                        string fullText = value.Substring(0, endIndex);
-                        string[] DateTime = fullText.Split('/');
-                        return $"民國{(Int32.Parse(DateTime[0]) - 1911)}年{DateTime[1]}月{DateTime[2]}日";
+                    value = v.ToString();
+                    int endIndex = value.ToString().IndexOf(" ");
+                    string fullText = value.Substring(0, endIndex);
+                    string[] DateTime = fullText.Split('/');
+                    return $"民國{(Int32.Parse(DateTime[0]) - 1911)}年{DateTime[1]}月{DateTime[2]}日";
                 default:
-                        return "unknowType";
+                    return "unknowType";
             }
         }
 
@@ -259,7 +312,7 @@ namespace OutFlowReportExportAPI.Helpers
         {
             for (int i = 0; i < lines.Length; i++)
             {
-                lines[i] = $"{ DateTime.Now:yyyy-MM-dd HH:mm:ss} -- {lines[i]}";
+                lines[i] = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} -- {lines[i]}";
             }
 
             string path = Path.Combine(HttpRuntime.BinDirectory, "..", "App_Data", "report.log");
