@@ -91,7 +91,6 @@ namespace OutFlowReportExportAPI.Helpers
                     int index = 0;
                     string trueBox = "\u25A0";
                     string falseBox = "\u25A1";
-
                     foreach (var data in databaseData["duplicateData"])
                     {
                         foreach (var item in data)
@@ -171,39 +170,55 @@ namespace OutFlowReportExportAPI.Helpers
                             ReplaceText(tDoc, $":False{i}", "");
                         }
                     }
-
-                    // 一般資料
-                    foreach (var data in databaseData["data"])
+                }
+                // 一般資料
+                foreach (var data in databaseData["data"])
+                {
+                    foreach (var item in data)
                     {
-                        foreach (var item in data)
+                        var value = item.Value;
+                        switch (item.Key)
                         {
-                            var value = item.Value ?? "";
-                            if (item.Key == "PA_Num")
-                            {
+                            case "PA_Num":
+                                if (value == null)
+                                {
+                                    value = "";
+                                    break;
+                                }
                                 value = Decry(value);
-                            }
-                            
-                            switch (item.Key)
-                            {
-                                case "FC_ResultStatus":
-                                    value = value ? "已達完工標準" : "未達完工標準";
+                                break;
+                            case "FC_ResultStatus":
+                                if (value == null)
+                                {
+                                    value = "";
                                     break;
-                                case "MM_SVCheck_Status":
-                                    value = value ? "是" : "否";
+                                }
+                                value = value ? "已達完工標準" : "未達完工標準";
+                                break;
+                            case "MM_SVCheck_Status":
+                                if (value == null)
+                                {
+                                    value = "";
                                     break;
-                                case "MM_Check_Result":
-                                case "MM_SVCheck_Result":
+                                }
+                                value = value ? "是" : "否";
+                                break;
+                            case "MM_Check_Result":
+                            case "MM_SVCheck_Result":
+                                if (value == null)
+                                {
+                                    value = "";
+                                    break;
+                                }
                                     value = value ? "合格" : "不合格";
-                                    break;
-                                case "MM_Change_type":
-                                    value = item.Value == null ? "否" : "是(請自行填寫變動項目)，變動項目:";
-                                    break;
-                            }
-                            ReplaceText(tDoc, $":{item.Key}", ConvertData(value));
+                                break;
+                            default:
+                                value = value ?? "";
+                                break;
                         }
+                        ReplaceText(tDoc, $":{item.Key}", ConvertData(value));
                     }
                 }
-
                 try
                 {
                     AppendLog(new string[] { $"Generate word => {path}" });

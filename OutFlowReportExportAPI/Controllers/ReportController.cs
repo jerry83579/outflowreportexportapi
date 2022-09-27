@@ -2482,7 +2482,7 @@ namespace OutFlowReportExportAPI.Controllers
         public string Get_MM_SVRecord()
         {
             var sql = @"SELECT msvr.MM_SVCheck_Date, msvr.MM_Check_Note_Now, msvr.MM_Check_Note_Bef, msvr.Note, 
-                      msvr.MM_SVCheck_Status, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.pA_Num, payer.PA_address, 
+                      msvr.MM_SVCheck_Status,msvr.MM_SVCheck_Result, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.pA_Num, payer.PA_address, 
                       start.EN_ST_Date, eac.EN_END_Date, Approved.Approved_NO, Approved.Approved_Date
                       FROM [MM_SVRecord] msvr
                       INNER JOIN [OutflowControlPlan] ofp on msvr.OFP_ID = ofp.OFP_ID
