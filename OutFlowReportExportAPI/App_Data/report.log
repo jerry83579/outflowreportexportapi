@@ -547,3 +547,8 @@
 2022-09-27 16:22:34 -- Open Template => D:\cSharp\outflowreportexportapi\OutFlowReportExportAPI\App_Data\template\appendix\no18_MMSVRecord.odt
 2022-09-27 16:22:35 -- no18_MMSVRecord.odt has data? True, template opened?True
 2022-09-27 16:22:36 -- Generate word => D:\cSharp\outflowreportexportapi\OutFlowReportExportAPI\bin\..\App_Data\temp\appendix\LR-OPL-008-111-0073\LR-OPL-008-111-0073.odt
+2022-09-27 16:25:36 -- Open Template => D:\cSharp\outflowreportexportapi\OutFlowReportExportAPI\App_Data\template\appendix\no18_MMSVRecord.odt
+2022-09-27 16:25:38 -- no18_MMSVRecord.odt has data? True, template opened?True
+2022-09-27 16:27:54 -- Open Template => D:\cSharp\outflowreportexportapi\OutFlowReportExportAPI\App_Data\template\appendix\no18_MMSVRecord.odt
+2022-09-27 16:27:56 -- no18_MMSVRecord.odt has data? True, template opened?True
+2022-09-27 16:27:57 -- Generate word => D:\cSharp\outflowreportexportapi\OutFlowReportExportAPI\bin\..\App_Data\temp\appendix\LR-OPL-008-111-0073\LR-OPL-008-111-0073.odt
