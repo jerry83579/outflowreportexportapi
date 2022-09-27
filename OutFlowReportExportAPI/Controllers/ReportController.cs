@@ -2309,11 +2309,12 @@ namespace OutFlowReportExportAPI.Controllers
         {
             var sql = @"SELECT ofp.OFP_Name, ofp.OFP_Gov, ofp.OFP_No, cl.EN_Checklist, cl.CheckSuggest, cl.Improve,
                       cl.ProphaseImprove, cl.Check_StartDate, cl.Check_Date, cl.Check_EndDate, cl.EN_PreSchedule, cl.EN_Schedule,
-                      payer.Payer, payer.PA_Tel, el.EngineerName
+                      payer.Payer, el.EngineerName, pl.Tel
                       FROM [OutflowControlPlan] ofp
                       INNER JOIN [EN_Checklist] cl on ofp.OFP_ID = cl.OFP_ID 
                       INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID 
                       INNER JOIN [EngineerList] el on ofp.SupervisorEngineer = el.ED_ID
+                      INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
                       WHERE cl.EC_ID = @ID";
             return sql;
         }
