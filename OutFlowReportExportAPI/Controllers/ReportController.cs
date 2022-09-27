@@ -2308,8 +2308,8 @@ namespace OutFlowReportExportAPI.Controllers
         public string Get_CheckList()
         {
             var sql = @"SELECT ofp.OFP_Name, ofp.OFP_Gov, ofp.OFP_No, cl.EN_Checklist, cl.CheckSuggest, cl.Improve,
-                      cl.ProphaseImprove, cl.Check_StartDate, cl.Check_EndDate, cl.EN_PreSchedule, cl.EN_Schedule,
-                      payer.Payer, el.EngineerName
+                      cl.ProphaseImprove, cl.Check_StartDate, cl.Check_Date, cl.Check_EndDate, cl.EN_PreSchedule, cl.EN_Schedule,
+                      payer.Payer, payer.PA_Tel, el.EngineerName
                       FROM [OutflowControlPlan] ofp
                       INNER JOIN [EN_Checklist] cl on ofp.OFP_ID = cl.OFP_ID 
                       INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID 
@@ -2378,7 +2378,7 @@ namespace OutFlowReportExportAPI.Controllers
         /// <returns></returns>
         public string Get_ENENDApplicationCompleted()
         {
-            var sql = @"SELECT eac.FILEID, eac.EN_END_Date, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,
+            var sql = @"SELECT eac.FILEID, eac.EN_END_Date, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address, payer.PA_Tel,
                       el.EngineerName, pl.PracticeUnits, pl.Address, pl.PracticeLicense, pl.GUI, pl.Tel, start.EN_ST_Date, Approved.Approved_No
                       FROM [ENEND_Application_Completed] eac 
                       INNER JOIN [OutflowControlPlan] ofp on eac.OFP_ID = ofp.OFP_ID
@@ -2454,7 +2454,7 @@ namespace OutFlowReportExportAPI.Controllers
         /// <returns></returns>
         public string Get_MM_Record()
         {
-            var sql = @"SELECT mr.MM_Check_Date, mr.MM_Check_Note_Now, mr.MM_Check_Note_Bef, mr.Note, mr.MM_Change_type, mr.MM_Check_Result, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,
+            var sql = @"SELECT mr.MM_Check_Date, mr.MM_Check_Note_Now, mr.MM_Check_Note_Bef, mr.Note, mr.MM_Change_type, mr.MM_Check_Result, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address, payer.PA_Tel,
                       start.EN_ST_Date, eac.EN_END_Date, Approved.Approved_No, Approved.Approved_Date
                       FROM [MM_Record] mr
                       INNER JOIN [OutflowControlPlan] ofp on mr.OFP_ID = ofp.OFP_ID
@@ -2482,7 +2482,7 @@ namespace OutFlowReportExportAPI.Controllers
         public string Get_MM_SVRecord()
         {
             var sql = @"SELECT msvr.MM_SVCheck_Date, msvr.MM_Check_Note_Now, msvr.MM_Check_Note_Bef, msvr.Note, 
-                      msvr.MM_SVCheck_Status,msvr.MM_SVCheck_Result, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.pA_Num, payer.PA_address, 
+                      msvr.MM_SVCheck_Status,msvr.MM_SVCheck_Result, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.pA_Num, payer.PA_address,
                       start.EN_ST_Date, eac.EN_END_Date, Approved.Approved_NO, Approved.Approved_Date
                       FROM [MM_SVRecord] msvr
                       INNER JOIN [OutflowControlPlan] ofp on msvr.OFP_ID = ofp.OFP_ID
