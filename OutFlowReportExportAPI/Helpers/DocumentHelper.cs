@@ -2,6 +2,7 @@
 using OpenDocumentLib.doc;
 using OpenDocumentLib.sheet;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -230,6 +231,19 @@ namespace OutFlowReportExportAPI.Helpers
                     tDoc.Dispose();
                 }
             }
+        }
+        public static List<string[]> SplitSqlData(List<dynamic> engineerData)
+        {
+            List<string[]> list = new List<string[]>();
+            
+            foreach (var data in engineerData)
+            {
+                foreach (var item in data)
+                {
+                    list.Add(item.Value.Split(','));
+                }
+            }
+            return list;
         }
         /// <summary>
         /// 

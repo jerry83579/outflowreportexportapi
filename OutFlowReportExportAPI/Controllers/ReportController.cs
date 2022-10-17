@@ -5,12 +5,14 @@ using OpenDocumentLib.sheet;
 using OutFlowReportExportAPI.Dtos;
 using OutFlowReportExportAPI.Helpers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Web.Http;
@@ -2208,6 +2210,7 @@ namespace OutFlowReportExportAPI.Controllers
             string Sql;
             List<dynamic> data;
             List<dynamic> duplicateData = null;
+            List<dynamic> engineerData;
             Dictionary<string, dynamic> databaseData = null;
             Dictionary<string, string> filename = new Dictionary<string, string>()
             {
@@ -2230,10 +2233,13 @@ namespace OutFlowReportExportAPI.Controllers
                         break;
                     //附件11
                     case "EnSVChecks":
+                        engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck_Enigneer_Data(), new { ID });
+                        List<string[]> engineerID = DocumentHelper.SplitSqlData(engineerData);
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck_Duplicate(), new { ID } )},
-                              {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck(), new { ID })
+                              {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck(), new { ID }) },
+                              {"engineerData", data = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck_Enigneer(engineerID), new { ID })
                             } };
                         break;
                     //附件13
@@ -2331,25 +2337,49 @@ namespace OutFlowReportExportAPI.Controllers
         /// <returns></returns>
         public string Get_ENSVCheck()
         {
-            var sql = @"SELECT svc.Check_Date, svc.Inconsistent_Item, svc.Correct_Item, svc.Precautions, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location,                   payer.Payer, payer.PA_Num, payer.PA_address, el.EngineerName, pl.PracticeUnits, pl.PracticeLicense, ec.EN_END_CP_Date,
-                      pl.GUI, pl.Tel, start.EN_ST_Date, Approved.Approved_No, Approved.Approved_Date
-                      FROM [EN_SVCheck] svc
-                      INNER JOIN [OutflowControlPlan] ofp on svc.OFP_ID = ofp.OFP_ID
-                      INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
-                      INNER JOIN [EngineerList] el on ofp.SupervisorEngineer = el.ED_ID
-                      INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
-                      INNER JOIN [EN_Starting] start on svc.ES_ID = start.ES_ID
-                      INNER JOIN [Approved] on svc.OFP_ID = Approved.OFP_ID
-                      INNER JOIN [ENEND_Completion] ec on ec.OFP_ID= ofp.OFP_ID
-                      WHERE svc.ECS_ID = @ID";
+            var sql = $@"SELECT svc.Check_Date, svc.Inconsistent_Item, svc.Correct_Item, svc.Precautions, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location,                        payer.Payer, payer.PA_Num, payer.PA_address, ec.EN_END_CP_Date,
+							 start.EN_ST_Date, Approved.Approved_No, Approved.Approved_Date
+                             FROM [EN_SVCheck] svc
+                             INNER JOIN [OutflowControlPlan] ofp on svc.OFP_ID = ofp.OFP_ID
+                             INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
+                             INNER JOIN [EN_Starting] start on svc.ES_ID = start.ES_ID
+                             INNER JOIN [Approved] on svc.OFP_ID = Approved.OFP_ID
+                             INNER JOIN [ENEND_Completion] ec on ec.ES_ID = svc.ES_ID
+                             WHERE svc.ECS_ID = @ID";
             return sql;
         }
 
         public string Get_ENSVCheck_Duplicate()
         {
-            var sql = @"SELECT svcI.Implementation_Situation, svcI.Note
-                      FROM [EN_SVCheck_Item] svcI
-                      WHERE svcI.ECS_ID = @ID";
+            var sql = $@"SELECT svcI.Implementation_Situation, svcI.Note
+                             FROM [EN_SVCheck_Item] svcI
+                             WHERE svcI.ECS_ID = @ID";
+            return sql;
+        }
+        //--INNER JOIN [EngineerList] el on  el.ED_ID = 9193 or  el.ED_ID = 9195
+        // --pl.GUI, pl.Tel,
+        //-- el.EngineerName, pl.PracticeUnits, pl.PracticeLicense,
+
+        public string Get_ENSVCheck_Enigneer_Data()
+        {
+            var sql = $@"SELECT  CoEngineer
+                             FROM [EN_SVCheck] svc
+                             INNER JOIN [OutflowControlPlan] ofp on svc.OFP_ID = ofp.OFP_ID
+                             WHERE svc.ECS_ID = @ID";
+            return sql;
+        }
+        public string Get_ENSVCheck_Enigneer(List<string[]> engineerData)
+        {
+            string parameterString = string.Join(",", engineerData.ToArray());
+            var sql = $@"SELECT  STUFF((
+                             SELECT ',' + EngineerName
+                             FROM EngineerList el
+                             WHERE ED_ID IN ({engineerData})
+                             FOR XML PATH('')), 1, 1,'') AS EngineerNames,
+		                     pl.GUI, pl.Tel, pl.PracticeUnits, pl.PracticeLicense
+                             FROM EngineerList el
+                             INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                             WHERE el.ED_ID = {engineerData[0][0]}";
             return sql;
         }
         /// <summary>
@@ -2368,7 +2398,7 @@ namespace OutFlowReportExportAPI.Controllers
                       INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
                       INNER JOIN [EN_Starting] start on esc.ES_ID = start.ES_ID
                       INNER JOIN [Approved] on esc.OFP_ID = Approved.OFP_ID
-                      INNER JOIN [ENEND_Completion] ec on ec.OFP_ID= ofp.OFP_ID
+                      INNER JOIN [ENEND_Completion] ec on ec.ES_ID= esc.ES_ID
                       INNER JOIN [ENEND_Application_Completed] eac on esc.ES_ID = eac.ES_ID 
                       WHERE esc.SC_ID = @ID";
             return sql;
@@ -2388,7 +2418,7 @@ namespace OutFlowReportExportAPI.Controllers
         /// <returns></returns>
         public string Get_ENENDApplicationCompleted()
         {
-            var sql = @"SELECT eac.FILEID, eac.EN_END_Date, eac.EN_END_AppDate, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer,                                        payer.PA_Num, payer.PA_address, payer.PA_Tel, el.EngineerName, pl.PracticeUnits, pl.Address, pl.PracticeLicense, pl.GUI,
+            var sql = @"SELECT eac.FILEID, eac.EN_END_Date, eac.EN_END_AppDate, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location,                    payer.Payer, payer.PA_Num, payer.PA_address, payer.PA_Tel, el.EngineerName, pl.PracticeUnits, pl.Address, pl.PracticeLicense, pl.GUI,
                               pl.Tel, start.EN_ST_Date,  Approved_Date, Approved.Approved_No
                               FROM [ENEND_Application_Completed] eac 
                               INNER JOIN [OutflowControlPlan] ofp on eac.OFP_ID = ofp.OFP_ID
@@ -2416,7 +2446,7 @@ namespace OutFlowReportExportAPI.Controllers
                       INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
                       INNER JOIN [EN_Starting] start on efc.ES_ID = start.ES_ID
                       INNER JOIN [Approved] on efc.OFP_ID = Approved.OFP_ID
-                      INNER JOIN [ENEND_Completion] ec on ec.OFP_ID= ofp.OFP_ID
+                      INNER JOIN [ENEND_Completion] ec on ec.ES_ID= efc.ES_ID
                       INNER JOIN [ENEND_Application_Completed] eac on efc.ES_ID = eac.ES_ID 
                       WHERE efc.FC_ID = @ID";
             return sql;
@@ -2478,7 +2508,7 @@ namespace OutFlowReportExportAPI.Controllers
                              INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
                              INNER JOIN [Approved] on mr.OFP_ID = Approved.OFP_ID
                              INNER JOIN [EN_Starting] start on mr.ES_ID = start.ES_ID
-                             INNER JOIN [ENEND_Completion] ec on ec.OFP_ID= ofp.OFP_ID
+                             INNER JOIN [ENEND_Completion] ec on ec.ES_ID= mr.ES_ID
                              INNER JOIN [ENEND_Application_Completed] eac on mr.ES_ID = eac.ES_ID 
                              WHERE MM_RE_ID = @ID";
             return sql;
