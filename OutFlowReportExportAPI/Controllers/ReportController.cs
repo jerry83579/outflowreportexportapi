@@ -2210,8 +2210,9 @@ namespace OutFlowReportExportAPI.Controllers
             string Sql;
             List<dynamic> data;
             List<dynamic> duplicateData = null;
-            List<dynamic> engineerData;
+            List<dynamic> engineerData = null;
             Dictionary<string, dynamic> databaseData = null;
+            List<string[]> engineerID;
             Dictionary<string, string> filename = new Dictionary<string, string>()
             {
                 {"PlanSupervision", "no10_PlanSupervision.odt"}, {"EnSVChecks", "no11_EnSVChecks.odt"},
@@ -2228,50 +2229,64 @@ namespace OutFlowReportExportAPI.Controllers
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateData", duplicateData},
-                              {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_CheckList(), new { ID })
-                            } };
+                              {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_CheckList(), new { ID }) },
+                              {"engineerData", engineerData }
+                            };
                         break;
                     //附件11
                     case "EnSVChecks":
+                        // 處理技師資料
                         engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck_Enigneer_Data(), new { ID });
-                        List<string[]> engineerID = DocumentHelper.SplitSqlData(engineerData);
+                        engineerID = DocumentHelper.SplitSqlData(engineerData);
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck_Duplicate(), new { ID } )},
                               {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck(), new { ID }) },
-                              {"engineerData", data = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck_Enigneer(engineerID), new { ID })
+                              {"engineerData", engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENSVCheck_Enigneer(engineerID), new { ID })
                             } };
                         break;
                     //附件13
                     case "EnEndSelfChecks":
+                        engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDSelfCheck_Engineer_Data(), new { ID });
+                        engineerID = DocumentHelper.SplitSqlData(engineerData);
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDSelfCheck_Duplicate(), new { ID } )},
-                              {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDSelfCheck(), new { ID })
+                              {"data", data = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDSelfCheck(), new { ID }) },
+                              {"engineerData", engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDSelfCheck_Engineer(engineerID), new { ID })
                             } };
                         break;
                     //附件14
                     case "EnEndApplicationCompleted":
+                        engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDApplicationCompleted_Engineer_Data(), new { ID });
+                        engineerID = DocumentHelper.SplitSqlData(engineerData);
                         databaseData = new Dictionary<string, dynamic>()
                             {
-                              {"duplicateData", duplicateData},
-                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDApplicationCompleted(), new { ID })
+                             {"duplicateData", duplicateData},
+                             {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDApplicationCompleted(), new { ID }) },
+                             {"engineerData", engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDApplicationCompleted_Engineer(engineerID),new{ ID })
                             } };
                         break;
                     //附件15
                     case "EnEndFinalChecks":
+                        engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDFinalCheck_Engineer_Data(), new { ID });
+                        engineerID = DocumentHelper.SplitSqlData(engineerData);
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDFinalCheck_Duplicate(), new { ID } )},
-                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDFinalCheck(), new { ID })
+                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDFinalCheck(), new { ID }) },
+                              {"engineerData", engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDFinalCheck_Engineer(engineerID), new { ID })
                             } };
                         break;
                     //附件16
                     case "EnEndCompletion":
+                        engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDCompletion_Engineer_Data(), new { ID });
+                        engineerID = DocumentHelper.SplitSqlData(engineerData);
                         databaseData = new Dictionary<string, dynamic>()
                             {
-                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDCompletion_Duplicate(), new { ID } )},
-                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDCompletion(), new { ID })
+                              {"duplicateData", duplicateData },
+                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_ENENDCompletion(), new { ID }) },
+                              {"engineerData", engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_ENENDCompletion_Engineer(engineerID), new { ID })
                             } };
                         break;
                     //附件17
@@ -2279,24 +2294,29 @@ namespace OutFlowReportExportAPI.Controllers
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_Record_Duplicate(), new { ID } )},
-                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_Record(), new { ID })
-                            } };
+                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_Record(), new { ID }) },
+                              {"engineerData", engineerData }
+                           };
                         break;
                     //附件18
                     case "MMSVRecord":
                         databaseData = new Dictionary<string, dynamic>()
                             {
                               {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_SVRecord_Duplicate(), new { ID } )},
-                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_SVRecord(), new { ID })
-                            } };
+                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_MM_SVRecord(), new { ID }) },
+                              {"engineerData", engineerData }
+                           };
                         break;
                     //附件20
                     case "EN_Starting":
+                        engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_EN_Starting_Engineer_Data(), new { ID });
+                        engineerID = DocumentHelper.SplitSqlData(engineerData);
                         databaseData = new Dictionary<string, dynamic>()
                             {
-                              {"duplicateData", duplicateData = UtilDB.GetDataList<dynamic>(Sql =  Get_EN_Starting_Duplicate(), new { ID } )},
-                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_EN_Starting(), new { ID })
-                            } };
+                              {"duplicateData", duplicateData},
+                              {"data", data = UtilDB.GetDataList<dynamic>(Sql =  Get_EN_Starting(), new { ID }) },
+                              {"engineerData", engineerData = UtilDB.GetDataList<dynamic>(Sql = Get_EN_Starting_Engineer(engineerID), new { ID }) }
+                            };
                         break;
                     default:
                         break;
@@ -2356,13 +2376,10 @@ namespace OutFlowReportExportAPI.Controllers
                              WHERE svcI.ECS_ID = @ID";
             return sql;
         }
-        //--INNER JOIN [EngineerList] el on  el.ED_ID = 9193 or  el.ED_ID = 9195
-        // --pl.GUI, pl.Tel,
-        //-- el.EngineerName, pl.PracticeUnits, pl.PracticeLicense,
 
         public string Get_ENSVCheck_Enigneer_Data()
         {
-            var sql = $@"SELECT  CoEngineer
+            var sql = $@"SELECT  SupervisorEngineer
                              FROM [EN_SVCheck] svc
                              INNER JOIN [OutflowControlPlan] ofp on svc.OFP_ID = ofp.OFP_ID
                              WHERE svc.ECS_ID = @ID";
@@ -2370,12 +2387,12 @@ namespace OutFlowReportExportAPI.Controllers
         }
         public string Get_ENSVCheck_Enigneer(List<string[]> engineerData)
         {
-            string parameterString = string.Join(",", engineerData.ToArray());
+            string data = string.Join(",", engineerData[0].ToArray());
             var sql = $@"SELECT  STUFF((
                              SELECT ',' + EngineerName
                              FROM EngineerList el
-                             WHERE ED_ID IN ({engineerData})
-                             FOR XML PATH('')), 1, 1,'') AS EngineerNames,
+                             WHERE ED_ID IN ({data})
+                             FOR XML PATH('')), 1, 1,'') AS EngineerName,
 		                     pl.GUI, pl.Tel, pl.PracticeUnits, pl.PracticeLicense
                              FROM EngineerList el
                              INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
@@ -2388,19 +2405,16 @@ namespace OutFlowReportExportAPI.Controllers
         /// <returns></returns>
         public string Get_ENENDSelfCheck()
         {
-            var sql = @"SELECT ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,
-                      el.EngineerName, pl.PracticeUnits, pl.PracticeLicense, pl.GUI, pl.Tel, start.EN_ST_Date,
-                      Approved.Approved_No, Approved.Approved_Date, eac.EN_END_Date, ec.EN_END_CP_Date
-                      FROM [ENEND_Self_Check] esc 
-                      INNER JOIN [OutflowControlPlan] ofp on esc.OFP_ID = ofp.OFP_ID
-                      INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
-                      INNER JOIN [EngineerList] el on ofp.SupervisorEngineer = el.ED_ID
-                      INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
-                      INNER JOIN [EN_Starting] start on esc.ES_ID = start.ES_ID
-                      INNER JOIN [Approved] on esc.OFP_ID = Approved.OFP_ID
-                      INNER JOIN [ENEND_Completion] ec on ec.ES_ID= esc.ES_ID
-                      INNER JOIN [ENEND_Application_Completed] eac on esc.ES_ID = eac.ES_ID 
-                      WHERE esc.SC_ID = @ID";
+            var sql = @"SELECT ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address, start.EN_ST_Date,
+                              Approved.Approved_No, Approved.Approved_Date, eac.EN_END_Date, ec.EN_END_CP_Date
+                              FROM [ENEND_Self_Check] esc 
+                              INNER JOIN [OutflowControlPlan] ofp on esc.OFP_ID = ofp.OFP_ID
+                              INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
+                              INNER JOIN [EN_Starting] start on esc.ES_ID = start.ES_ID
+                              INNER JOIN [Approved] on esc.OFP_ID = Approved.OFP_ID
+                              INNER JOIN [ENEND_Completion] ec on ec.ES_ID= esc.ES_ID
+                              INNER JOIN [ENEND_Application_Completed] eac on esc.ES_ID = eac.ES_ID 
+                              WHERE esc.SC_ID = @ID";
             return sql;
         }
 
@@ -2412,22 +2426,67 @@ namespace OutFlowReportExportAPI.Controllers
             return sql;
         }
 
+        public string Get_ENENDSelfCheck_Engineer_Data()
+        {
+            var sql = $@"SELECT  SupervisorEngineer
+                             FROM [ENEND_Self_Check] esc 
+                             INNER JOIN [OutflowControlPlan] ofp on esc.OFP_ID = ofp.OFP_ID
+                             WHERE esc.SC_ID = @ID";
+            return sql;
+        }
+
+        public string Get_ENENDSelfCheck_Engineer(List<string[]> engineerData)
+        {
+            string data = string.Join(",", engineerData[0].ToArray());
+            var sql = $@"SELECT  STUFF((
+                             SELECT ',' + EngineerName
+                             FROM EngineerList el
+                             WHERE ED_ID IN ({data})
+                             FOR XML PATH('')), 1, 1,'') AS EngineerName,
+		                     pl.GUI, pl.Tel, pl.PracticeUnits, pl.PracticeLicense
+                             FROM EngineerList el
+                             INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                             WHERE el.ED_ID = {engineerData[0][0]}";
+            return sql;
+        }
+
         /// <summary>
         /// 附件14
         /// </summary>
         /// <returns></returns>
         public string Get_ENENDApplicationCompleted()
         {
-            var sql = @"SELECT eac.FILEID, eac.EN_END_Date, eac.EN_END_AppDate, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location,                    payer.Payer, payer.PA_Num, payer.PA_address, payer.PA_Tel, el.EngineerName, pl.PracticeUnits, pl.Address, pl.PracticeLicense, pl.GUI,
-                              pl.Tel, start.EN_ST_Date,  Approved_Date, Approved.Approved_No
+            var sql = @"SELECT eac.FILEID, eac.EN_END_Date, eac.EN_END_AppDate, eac.EN_END_AppDate, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location,                    payer.Payer, payer.PA_Num, payer.PA_address, payer.PA_Tel, start.EN_ST_Date,  Approved_Date, Approved.Approved_No
                               FROM [ENEND_Application_Completed] eac 
                               INNER JOIN [OutflowControlPlan] ofp on eac.OFP_ID = ofp.OFP_ID
                               INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
-                              INNER JOIN [EngineerList] el on ofp.SupervisorEngineer = el.ED_ID
-                              INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
                               INNER JOIN [EN_Starting] start on eac.ES_ID = start.ES_ID
                               INNER JOIN [Approved] on eac.OFP_ID = Approved.OFP_ID
                               WHERE eac.AC_ID = @ID";
+            return sql;
+        }
+
+        public string Get_ENENDApplicationCompleted_Engineer_Data()
+        {
+            var sql = $@"SELECT  SupervisorEngineer
+                             FROM [ENEND_Application_Completed] eac 
+                             INNER JOIN [OutflowControlPlan] ofp on eac.OFP_ID = ofp.OFP_ID
+                             WHERE eac.AC_ID = @ID";
+            return sql;
+        }
+
+        public string Get_ENENDApplicationCompleted_Engineer(List<string[]> engineerData)
+        {
+            string data = string.Join(",", engineerData[0].ToArray());
+            var sql = $@"SELECT  STUFF((
+                             SELECT ',' + EngineerName
+                             FROM EngineerList el
+                             WHERE ED_ID IN ({data})
+                             FOR XML PATH('')), 1, 1,'') AS EngineerName,
+		                     pl.PracticeUnits, pl.Address, pl.PracticeLicense, pl.GUI, pl.Tel
+                             FROM EngineerList el
+                             INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                             WHERE el.ED_ID = {engineerData[0][0]}";
             return sql;
         }
         /// <summary>
@@ -2437,30 +2496,50 @@ namespace OutFlowReportExportAPI.Controllers
         public string Get_ENENDFinalCheck()
         {
             var sql = @"SELECT ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num,  payer.PA_address, 
-                      el.EngineerName, pl.PracticeUnits, pl.PracticeLicense, pl.GUI, pl.Tel, start.EN_ST_Date, ec.EN_END_CP_Date,
-                      Approved_No, Approved.Approved_Date, eac.EN_END_Date, efc.FC_Date, FC_Note, efc.FC_ResultStatus
-                      FROM [ENEND_Final_Check] efc 
-                      INNER JOIN [OutflowControlPlan] ofp on efc.OFP_ID = ofp.OFP_ID
-                      INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
-                      INNER JOIN [EngineerList] el on ofp.SupervisorEngineer = el.ED_ID
-                      INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
-                      INNER JOIN [EN_Starting] start on efc.ES_ID = start.ES_ID
-                      INNER JOIN [Approved] on efc.OFP_ID = Approved.OFP_ID
-                      INNER JOIN [ENEND_Completion] ec on ec.ES_ID= efc.ES_ID
-                      INNER JOIN [ENEND_Application_Completed] eac on efc.ES_ID = eac.ES_ID 
-                      WHERE efc.FC_ID = @ID";
+                              start.EN_ST_Date, ec.EN_END_CP_Date,
+                              Approved_No, Approved.Approved_Date, eac.EN_END_Date, efc.FC_Date, FC_Note, efc.FC_ResultStatus
+                              FROM [ENEND_Final_Check] efc 
+                              INNER JOIN [OutflowControlPlan] ofp on efc.OFP_ID = ofp.OFP_ID
+                              INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
+                              INNER JOIN [EN_Starting] start on efc.ES_ID = start.ES_ID
+                              INNER JOIN [Approved] on efc.OFP_ID = Approved.OFP_ID
+                              INNER JOIN [ENEND_Completion] ec on ec.ES_ID= efc.ES_ID
+                              INNER JOIN [ENEND_Application_Completed] eac on efc.ES_ID = eac.ES_ID 
+                              WHERE efc.FC_ID = @ID";
             return sql;
         }
 
         public string Get_ENENDFinalCheck_Duplicate()
         {
-            var sql = @"SELECT FacilityName, Location, ApprovedNum, ActualNum, DefPercentNum, DefPercentNum, ApprovedSize, ActualSize, DefPercentSize, IsQualified
-                      FROM [ENEND_Final_Check_Item] efcI
-                      WHERE efcI.FC_ID = @ID";
+            var sql = @"SELECT FacilityName, Location, ApprovedNum, ActualNum, DefPercentNum, DefPercentNum, ApprovedSize, ActualSize,                                         DefPercentSize, IsQualified
+                             FROM [ENEND_Final_Check_Item] efcI
+                             WHERE efcI.FC_ID = @ID";
             return sql;
         }
 
+        public string Get_ENENDFinalCheck_Engineer_Data()
+        {
+            var sql = $@"SELECT  SupervisorEngineer
+                             FROM [ENEND_Final_Check] efc
+                             INNER JOIN [OutflowControlPlan] ofp on efc.OFP_ID = ofp.OFP_ID
+                             WHERE efc.FC_ID = @ID";
+            return sql;
+        }
 
+        public string Get_ENENDFinalCheck_Engineer(List<string[]> engineerData)
+        {
+            string data = string.Join(",", engineerData[0].ToArray());
+            var sql = $@"SELECT  STUFF((
+                             SELECT ',' + EngineerName
+                             FROM EngineerList el
+                             WHERE ED_ID IN ({data})
+                             FOR XML PATH('')), 1, 1,'') AS EngineerName,
+		                     pl.PracticeUnits, pl.PracticeLicense, pl.GUI, pl.Tel
+                             FROM EngineerList el
+                             INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                             WHERE el.ED_ID = {engineerData[0][0]}";
+            return sql;
+        }
         /// <summary>
         /// 附件16
         /// </summary>
@@ -2478,21 +2557,38 @@ namespace OutFlowReportExportAPI.Controllers
             return sql;
         }
 
-        public string Get_ENENDCompletion_Duplicate()
+        public string Get_ENENDCompletion_Engineer_Data()
         {
-            var sql = @"SELECT el.EngineerName, el.EngineerLicense,  pl.PracticeUnits,  pl.GUI, pl.Address, pl.Tel
-                              FROM [ENEND_Completion] ec 
-                              INNER JOIN [OutflowControlPlan] ofp on ec.OFP_ID = ofp.OFP_ID
-                              INNER JOIN [EngineerList] el on ofp.Engineer = el.ED_ID
-                              INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
-                              WHERE ec.CP_ID = @ID
-							  UNION all 
-							  SELECT el.EngineerName, el.EngineerLicense,  pl.PracticeUnits,  pl.GUI, pl.Address, pl.Tel
-                              FROM [ENEND_Completion] ec 
-                              INNER JOIN [OutflowControlPlan] ofp on ec.OFP_ID = ofp.OFP_ID
-                              INNER JOIN [EngineerList] el on ofp.SupervisorEngineer = el.ED_ID  
-                              INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
-                              WHERE ec.CP_ID = @ID";
+            var sql = $@"SELECT  Engineer, SupervisorEngineer
+                             FROM [ENEND_Completion] ec
+                             INNER JOIN [OutflowControlPlan] ofp on ec.OFP_ID = ofp.OFP_ID
+                             WHERE ec.CP_ID = @ID";
+            return sql;
+        }
+
+        public string Get_ENENDCompletion_Engineer(List<string[]> data)
+        {
+            string engineerData = string.Join(",", data[0].ToArray());
+            string SupervisorEngineerData = string.Join(",", data[1].ToArray());
+            var sql = $@"SELECT  STUFF((
+                             SELECT ',' + EngineerName
+                             FROM EngineerList el
+                             WHERE ED_ID IN ({engineerData})
+                             FOR XML PATH('')), 1, 1,'') AS EngineerName,
+		                     el.EngineerLicense, pl.PracticeUnits,  pl.GUI, pl.Address, pl.Tel
+                             FROM EngineerList el
+                             INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                             WHERE el.ED_ID = {data[0][0]}
+                             UNION ALL
+                             SELECT  STUFF((
+                             SELECT ',' + EngineerName
+                             FROM EngineerList el
+                             WHERE ED_ID IN ({SupervisorEngineerData})
+                             FOR XML PATH('')), 1, 1,'') AS EngineerName,
+		                     el.EngineerLicense, pl.PracticeUnits,  pl.GUI, pl.Address, pl.Tel
+                             FROM EngineerList el
+                             INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                             WHERE el.ED_ID = {data[1][0]}";
             return sql;
         }
         /// <summary>
@@ -2501,8 +2597,7 @@ namespace OutFlowReportExportAPI.Controllers
         /// <returns></returns>
         public string Get_MM_Record()
         {
-            var sql = @"SELECT mr.MM_Check_Date, mr.MM_Check_Note_Now, mr.MM_Check_Note_Bef, mr.Note, mr.MM_Change_type,                                                     mr.MM_Check_Result, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address, payer.PA_Tel,
-                             start.EN_ST_Date, eac.EN_END_Date, Approved.Approved_No, Approved.Approved_Date, ec.EN_END_CP_Date
+            var sql = @"SELECT mr.MM_Check_Date, mr.MM_Check_Note_Now, mr.MM_Check_Note_Bef, mr.Note, mr.MM_Change_type,                         mr.MM_Check_Result, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,                       payer.PA_Tel,start.EN_ST_Date, eac.EN_END_Date, Approved.Approved_No, Approved.Approved_Date,                                                   ec.EN_END_CP_Date
                              FROM [MM_Record] mr
                              INNER JOIN [OutflowControlPlan] ofp on mr.OFP_ID = ofp.OFP_ID
                              INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
@@ -2530,15 +2625,16 @@ namespace OutFlowReportExportAPI.Controllers
         public string Get_MM_SVRecord()
         {
             var sql = @"SELECT msvr.MM_SVCheck_Date, msvr.MM_Check_Note_Now, msvr.MM_Check_Note_Bef, msvr.Note, 
-                             msvr.MM_SVCheck_Status,msvr.MM_SVCheck_Result, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.Payer, payer.PA_Num, payer.PA_address,
-                              start.EN_ST_Date, eac.EN_END_Date, Approved.Approved_NO, Approved.Approved_Date
-                              FROM [MM_SVRecord] msvr
-                              INNER JOIN [OutflowControlPlan] ofp on msvr.OFP_ID = ofp.OFP_ID
-                              INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
-                              INNER JOIN [Approved] on msvr.OFP_ID = Approved.OFP_ID
-                              INNER JOIN [EN_Starting] start on msvr.ES_ID = start.ES_ID
-                              INNER JOIN [ENEND_Application_Completed] eac on msvr.ES_ID = eac.ES_ID 
-                              WHERE msvr.MM_SV_ID = @ID";
+                             msvr.MM_SVCheck_Status,msvr.MM_SVCheck_Result, ofp.OFP_Name, ofp.OFP_No, ofp.OFP_Location, payer.PA_Num,        payer.PA_address, payer.Payer, ec.EN_END_CP_Date,
+                             start.EN_ST_Date, eac.EN_END_Date, Approved.Approved_NO, Approved.Approved_Date
+                             FROM [MM_SVRecord] msvr
+                             INNER JOIN [OutflowControlPlan] ofp on msvr.OFP_ID = ofp.OFP_ID
+                             INNER JOIN [payer] on ofp.PA_ID = payer.PA_ID
+                             INNER JOIN [Approved] on msvr.OFP_ID = Approved.OFP_ID
+                             INNER JOIN [EN_Starting] start on msvr.ES_ID = start.ES_ID
+                             INNER JOIN [ENEND_Completion] ec on ec.ES_ID= start.ES_ID
+                             INNER JOIN [ENEND_Application_Completed] eac on msvr.ES_ID = eac.ES_ID 
+                             WHERE msvr.MM_SV_ID = @ID";
             return sql;
         }
 
@@ -2556,37 +2652,53 @@ namespace OutFlowReportExportAPI.Controllers
         /// <returns></returns>
         public string Get_EN_Starting()
         {
-            var sql = @"SELECT start.EN_Name, start.EN_No,                                                                                                                                                                                                      start.EN_ST_No ,start.EN_ST_Date ,start.RVGov_Acc_NO ,start.RVGov_Acc_StartDate ,start.EN_StartDate ,start.EN_Pre_EndDate,
-                             ofp.OFP_Name, ofp.OFP_No, Approved.Approved_Date, Approved.Approved_No
+            var sql = @"SELECT start.EN_Name, start.EN_No,    start.EN_ST_No ,start.EN_ST_Date ,start.RVGov_Acc_NO ,start.RVGov_Acc_StartDate ,start.EN_StartDate ,start.EN_Pre_EndDate,   ofp.OFP_Name, ofp.OFP_No, Approved.Approved_Date, Approved.Approved_No FROM [EN_Starting] start INNER JOIN                    [OutflowControlPlan] ofp on start.OFP_ID = ofp.OFP_ID INNER JOIN [Approved] on start.OFP_ID = Approved.OFP_ID WHERE start.ES_ID = @ID";
+            return sql;
+        }
+
+        public string Get_EN_Starting_Engineer_Data()
+        {
+            var sql = $@"SELECT  Engineer, SupervisorEngineer, ConstructionEngineer
                              FROM [EN_Starting] start 
                              INNER JOIN [OutflowControlPlan] ofp on start.OFP_ID = ofp.OFP_ID
-                             INNER JOIN [Approved] on start.OFP_ID = Approved.OFP_ID
                              WHERE start.ES_ID = @ID";
             return sql;
         }
 
-        public string Get_EN_Starting_Duplicate()
+        public string Get_EN_Starting_Engineer(List<string[]> data)
         {
-            var sql = @"SELECT el.EngineerName, el.EngineerLicense,  pl.PracticeUnits,  pl.GUI
-                              FROM [EN_Starting] start 
-                              INNER JOIN [OutflowControlPlan] ofp on start.OFP_ID = ofp.OFP_ID
-                              INNER JOIN [EngineerList] el on    ofp.Engineer = el.ED_ID
-                              INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
-                              WHERE start.ES_ID = @ID
-							  UNION all 
-							  SELECT el.EngineerName, el.EngineerLicense,  pl.PracticeUnits,  pl.GUI
-                              FROM [EN_Starting] start 
-                              INNER JOIN [OutflowControlPlan] ofp on start.OFP_ID = ofp.OFP_ID
-                              INNER JOIN [EngineerList] el on ofp.SupervisorEngineer = el.ED_ID  
-                              INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
-                              WHERE start.ES_ID = @ID
-							  UNION all 
-							  SELECT el.EngineerName, el.EngineerLicense,  pl.PracticeUnits,  pl.GUI
-                              FROM [EN_Starting] start 
-                              INNER JOIN [OutflowControlPlan] ofp on start.OFP_ID = ofp.OFP_ID
-                              INNER JOIN [EngineerList] el on  ofp.ConstructionEngineer = el.ED_ID
-                              INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
-                              WHERE start.ES_ID = @ID";
+            string engineerData = string.Join(",", data[0].ToArray());
+            string SupervisorEngineerData = string.Join(",", data[1].ToArray());
+            string ConstructionEngineerData = string.Join(",", data[2].ToArray());
+            var sql = $@"SELECT  STUFF((
+                             SELECT ',' + EngineerName
+                             FROM EngineerList el
+                             WHERE ED_ID IN ({engineerData})
+                             FOR XML PATH('')), 1, 1,'') AS EngineerName,
+		                     el.EngineerLicense,  pl.PracticeUnits,  pl.GUI
+                             FROM EngineerList el
+                             INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                             WHERE el.ED_ID = {data[0][0]}
+                             UNION ALL
+                             SELECT  STUFF((
+                             SELECT ',' + EngineerName
+                             FROM EngineerList el
+                             WHERE ED_ID IN ({SupervisorEngineerData})
+                             FOR XML PATH('')), 1, 1,'') AS EngineerName,
+		                     el.EngineerLicense,  pl.PracticeUnits,  pl.GUI
+                             FROM EngineerList el
+                             INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                             WHERE el.ED_ID = {data[1][0]}
+                             UNION ALL
+                             SELECT  STUFF((
+                             SELECT ',' + EngineerName
+                             FROM EngineerList el
+                             WHERE ED_ID IN ({ConstructionEngineerData})
+                             FOR XML PATH('')), 1, 1,'') AS EngineerName,
+		                     el.EngineerLicense,  pl.PracticeUnits,  pl.GUI
+                             FROM EngineerList el
+                             INNER JOIN [PracticeList] pl on el.PU_ID = pl.PU_ID
+                             WHERE el.ED_ID = {data[2][0]}";
             return sql;
         }
 

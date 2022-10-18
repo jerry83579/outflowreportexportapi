@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>D:\cSharp\outflowreportexportapi\OutFlowReportExportAPI\bin\app.publish\</_PublishTargetUrl>
-    <History>True|2022-10-13T08:30:47.5903192Z;</History>
+    <History>True|2022-10-18T05:49:52.1934687Z;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -223,10 +223,10 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>08/30/2022 11:30:15</publishTime>
     </File>
     <File Include="bin/OutFlowReportExportAPI.dll">
-      <publishTime>10/13/2022 16:30:46</publishTime>
+      <publishTime>10/18/2022 13:49:51</publishTime>
     </File>
     <File Include="bin/OutFlowReportExportAPI.pdb">
-      <publishTime>10/13/2022 16:30:46</publishTime>
+      <publishTime>10/18/2022 13:49:51</publishTime>
     </File>
     <File Include="bin/roslyn/csc.exe">
       <publishTime>08/08/2018 13:38:48</publishTime>

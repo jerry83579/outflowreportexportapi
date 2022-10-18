@@ -220,7 +220,37 @@ namespace OutFlowReportExportAPI.Helpers
                         ReplaceText(tDoc, $":{item.Key}", ConvertData(value));
                     }
                 }
-                try
+
+                // 技師資料
+                if (databaseData["engineerData"] != null)
+                {
+                    int index = 0;
+                    if (databaseData["engineerData"].Count > 1)
+                    {
+                        foreach (var data in databaseData["engineerData"])
+                        {
+                            foreach (var item in data)
+                            {
+                                var value = item.Value;
+                                ReplaceText(tDoc, $":{item.Key}{index}", ConvertData(value));
+                            }
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        foreach (var data in databaseData["engineerData"])
+                        {
+                            foreach (var item in data)
+                            {
+                                var value = item.Value;
+                                ReplaceText(tDoc, $":{item.Key}", ConvertData(value));
+                            }
+                        }
+                    }
+                }
+
+                    try
                 {
                     AppendLog(new string[] { $"Generate word => {path}" });
                     tDoc.SaveAs(path);
